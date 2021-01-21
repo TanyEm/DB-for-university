@@ -1,0 +1,68 @@
+SELECT 
+    CONCAT (firstname,' ', middleinitial,' ', lastname) AS name, 
+    street, 
+    city, 
+    state, 
+    zip
+FROM member
+JOIN adult ON member.member_no = adult.member_no 
+--------------------
+SELECT 
+    c.isbn AS copyISBN, 
+    c.copy_no AS CopyNo, 
+    c.on_loan AS copyOnloan, 
+    t.title AS titleTitle, 
+    i.translation AS titleTrans, 
+    i.cover AS itemCover
+FROM title t
+	INNER JOIN copy c ON t.title_no = c.title_no
+	INNER JOIN item i ON i.isbn = c.isbn
+WHERE 
+    c.isbn = 1 OR c.isbn = 500 OR c.isbn = 1000
+ORDER BY c.isbn
+-----------------------------
+SELECT 
+    CONCAT(m.lastname, m.firstname, m.middleinitial) AS Name, 
+    CONVERT(char(8),r.log_date) as Date
+FROM 
+    member m
+    FULL OUTER JOIN reservation r ON m.member_no = r.member_no
+WHERE 
+    m.member_no = 250 OR m.member_no = 341 OR m.member_no = 1675
+ORDER BY m.member_no
+-----------------------------
+SELECT 
+    a.member_no, 
+    COUNT(j.adult_member_no) as numkids 
+FROM adult a
+JOIN juvenile j ON j.adult_member_no = a.member_no
+WHERE a.state = 'AZ'
+GROUP BY a.member_no
+HAVING COUNT(j.adult_member_no) > 2
+-----------------------------
+SELECT 
+    a.member_no, 
+    COUNT(j.adult_member_no) as numkids 
+FROM adult a
+JOIN juvenile j ON j.adult_member_no = a.member_no
+WHERE a.state = 'CA'
+GROUP BY a.member_no
+HAVING COUNT(j.adult_member_no) > 3
+------------------------------
+SELECT 
+    a.member_no, 
+    COUNT(j.adult_member_no) as numkids 
+FROM adult a
+JOIN juvenile j ON j.adult_member_no = a.member_no
+WHERE a.state = 'CA'
+GROUP BY a.member_no
+HAVING COUNT(j.adult_member_no) > 3
+
+UNION SELECT 
+    a.member_no, 
+    COUNT(j.adult_member_no) as numkids 
+FROM adult a
+JOIN juvenile j ON j.adult_member_no = a.member_no
+WHERE a.state = 'AZ'
+GROUP BY a.member_no
+HAVING COUNT(j.adult_member_no) > 2

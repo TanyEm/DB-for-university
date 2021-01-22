@@ -1,0 +1,134 @@
+INSERT INTO item (isbn, title_no, Cover, Loanable, Translation)
+VALUES 
+(10001,8,'HARDBACK','Y','ENGLSIH'),
+(10101,8,'SOFTBACK','Y','ENGLSIH')
+----------------------------------
+SELECT 
+    isbn, 
+    title_no, 
+    Cover, 
+    Loanable, 
+    Translation 
+FROM item
+WHERE title_no = 8
+----------------------------------
+INSERT INTO copy (isbn, copy_no, title_no, on_loan)
+VALUES 
+(10001, 1, 8, 'N')
+------------------
+--Запрос для проверки вставки
+SELECT 
+    isbn, copy_no, 
+    title_no, 
+    on_loan 
+FROM copy
+WHERE isbn = 10001
+--------------------------------
+SELECT Translation  
+FROM item
+WHERE isbn = 10001
+--------------------------------
+INSERT INTO title (title, author, synopsis)
+VALUES('The Art of Lawn Tennis', 'William T.', DEFAULT)
+--Запрос 2: запрос подтверждающий факт вставки
+SELECT 
+    t.title, 
+    t.author, 
+    t.synopsis 
+FROM title t
+WHERE title = 'The Art of Lawn Tennis'
+-------------------------------
+SELECT IDENT_CURRENT('title')
+-------------------------------
+SELECT * 
+FROM title
+WHERE title_no = 51
+-------------------------------
+INSERT INTO title (title, author, synopsis)
+VALUES('The Art of Lawn Tennis', 'William T.', DEFAULT)
+-- Запрос 6: Написать запрос подтверждающий факт вставки
+SELECT * 
+FROM title
+WHERE title_no = IDENT_CURRENT('title')
+-------------------------------
+USE LIBRARY
+CREATE TABLE sample1
+(Cust_id int NOT NULL IDENTITY(100,5), NAME CHAR(10) NULL)
+-------------------------------
+INSERT INTO sample1 DEFAULT VALUES
+
+--Запрос 2:Написать запрос чтобы убедится добавлении новой записи
+SELECT * FROM sample1
+-------------------------------
+SELECT * 
+FROM item
+WHERE isbn = 10101 AND title_no = 8 AND cover = 'SOFTBACK'
+-------------------------------
+DELETE FROM item
+WHERE isbn = 10101 AND title_no = 8 AND cover = 'SOFTBACK'
+-------------------------------
+SELECT * 
+FROM member
+WHERE member_no = 507
+-------------------------------
+UPDATE member
+SET lastname = 'Hopps'
+WHERE member_no = 507
+-------------------------------
+USE library
+BEGIN TRANSACTION
+SET IDENTITY_INSERT MEMBER ON
+INSERT member(member_no, lastname, firstname, middleinitial)
+VALUES (16101,'Walters', 'B','L')
+SET IDENTITY_INSERT member OFF
+INSERT juvenile
+VALUES (16101,1,DATEADD(YY,-18,DATEADD(DD,-1, GETDATE())))
+COMMIT TRANSACTION
+-------------------------------
+SELECT 
+    juvenile.member_no, 
+    street, 
+    city,  
+    state, 
+    zip, 
+    phone_no, 
+    DATEADD(yy, 1, Getdate()) as Year 
+FROM juvenile
+JOIN adult ON juvenile.adult_member_no = adult.member_no
+WHERE birth_date > DATEADD(YY, -18,Getdate())
+-------------------------------
+INSERT INTO adult 
+SELECT 
+    juvenile.member_no, 
+    street, 
+    city,  
+    state, 
+    zip, 
+    phone_no, 
+    DATEADD(yy, 1, Getdate()) as Year 
+FROM juvenile
+JOIN adult ON juvenile.adult_member_no = adult.member_no
+WHERE birth_date < DATEADD(YY, -18,Getdate())
+-------------------------------
+Select * 
+FROM adult
+WHERE member_no = 16101
+-------------------------------
+DELETE FROM juvenile
+WHERE EXISTS(
+    SELECT 
+      juvenile.member_no, 
+      street, 
+        city,  
+        state, 
+        zip, 
+        phone_no, 
+        DATEADD(yy, 1, Getdate()) as Year  
+    FROM juvenile
+    JOIN adult ON juvenile.adult_member_no = adult.member_no
+    WHERE birth_date < DATEADD(YY, -18,Getdate())
+)
+-------------------------------
+SELECT * 
+FROM juvenile
+WHERE member_no = 16101

@@ -1,0 +1,81 @@
+USE AdventureWorks
+
+-- START TRANSACTION HERE
+BEGIN TRANSACTION
+  SELECT @@trancount AS 'Transaction Count'
+  SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 342
+  UPDATE Person.Contact SET FirstName = 'Lin' WHERE ContactID = 342
+
+
+SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 342
+SELECT @@trancount AS 'Transaction Count'
+
+------------------------
+
+USE AdventureWorks
+
+-- START TRANSACTION HERE
+BEGIN TRANSACTION
+  SELECT @@trancount AS 'Transaction Count'
+  SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 342
+  UPDATE Person.Contact SET FirstName = 'Lin' WHERE ContactID = 342
+-- END TRANSACTION HERE
+COMMIT TRANSACTION
+
+SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 342
+SELECT @@trancount AS 'Transaction Count'
+
+---------------------
+USE AdventureWorks
+
+BEGIN TRANSACTION
+  SELECT @@trancount AS 'Transaction Count'
+  SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 7454
+  UPDATE Person.Contact SET FirstName = 'Dom' WHERE ContactID = 7454
+  SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 7454
+  SELECT @@trancount AS 'Transaction Count'
+-- END TRANSACTION HERE
+ROLLBACK TRANSACTION
+
+  SELECT FirstName, MiddleName, LastName FROM Person.Contact WHERE ContactID = 7454
+  SELECT @@trancount AS 'Transaction Count'
+
+-----------------------
+SELECT 
+    resource_type, 
+    request_mode, 
+    request_type, 
+    request_status, 
+    request_session_id
+FROM 
+    sys.dm_tran_locks
+
+------------------------
+
+USE AdventureWorks
+
+BEGIN TRANSACTION
+  UPDATE Person.Contact
+    SET FirstName = 'Fran'
+    WHERE ContactID = 6
+-- For the purpose of the exercise, COMMIT TRANASACTION or ROLLBACK TRANSACTION are not used.
+
+
+SELECT @@spid AS 'spid'
+-- Use the SPID to identify the connection when using sys.dm_tran_locks.
+
+ROLLBACK TRANSACTION
+
+-----------------------
+
+USE AdventureWorks
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+
+SET lock_timeout 5000
+
+BEGIN TRANSACTION
+  SELECT * FROM Person.Contact WHERE ContactID = 10
+  UPDATE Person.Contact SET FirstName = 'Frances' WHERE ContactID = 6
+
+ROLLBACK TRANSACTION
